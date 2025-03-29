@@ -9,7 +9,7 @@ from io import BytesIO
 app = Flask(__name__)
 
 # Configure the LLaMA API key
-LLAMA_API_KEY = "e814dcd0-ae27-4367-9df1-a7e1a09841f0"
+LLAMA_API_KEY = "2db70e18-55fe-4828-bb55-aafe24a131e5"
 client = openai.OpenAI(
     api_key=LLAMA_API_KEY,
     base_url="https://api.sambanova.ai/v1",
