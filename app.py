@@ -4,14 +4,14 @@ from PIL import Image
 import cv2
 import numpy as np
 import openai
-from io import BytesIO
+import os
 
 app = Flask(__name__)
 
-# Configure the LLaMA API key
-LLAMA_API_KEY = "2db70e18-55fe-4828-bb55-aafe24a131e5"
+# Configure the DeepSeek API client
+DEEPSEEK_API_KEY = "3a278c8d-75fc-49bb-be44-85ec34d2d6f3"  # Replace with os.environ.get("DEEPSEEK_API_KEY") in production
 client = openai.OpenAI(
-    api_key=LLAMA_API_KEY,
+    api_key=DEEPSEEK_API_KEY,
     base_url="https://api.sambanova.ai/v1",
 )
 
@@ -28,9 +28,9 @@ def clean_response(text):
     """Remove asterisks from the response text."""
     return text.replace('**', '')
 
-def get_medicine_info_from_llama(medicine_name):
+def get_medicine_info_from_deepseek(medicine_name):
     response = client.chat.completions.create(
-        model="Llama-3.1-Swallow-8B-Instruct-v0.3",
+        model="DeepSeek-R1",
         messages=[
             {"role": "system", "content": "You are a helpful assistant."},
             {"role": "user", "content": f"What can you tell me about {medicine_name} medicine?"}
@@ -43,7 +43,7 @@ def get_medicine_info_from_llama(medicine_name):
 
 def fetch_nearby_hospitals(location):
     response = client.chat.completions.create(
-        model="Llama-3.1-Swallow-8B-Instruct-v0.3",
+        model="DeepSeek-R1",
         messages=[
             {"role": "system", "content": "You are a helpful assistant that provides the names of nearby hospitals based on the user's location. Categorize the hospitals into public and private sectors and give their locations also"},
             {"role": "user", "content": f"Can you list the names of hospitals near {location}? Categorize them into public and private sectors and include the hospitals locations"}
@@ -86,7 +86,7 @@ def get_medicine_info():
     if not medicine_name:
         return jsonify({'error': 'Please enter a medicine name!'}), 400
     try:
-        response = get_medicine_info_from_llama(medicine_name)
+        response = get_medicine_info_from_deepseek(medicine_name)
         return jsonify({'response': response})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -103,7 +103,7 @@ def upload_image():
     if not extracted_name:
         return jsonify({'error': 'Could not extract a valid medicine name from the image.'}), 400
     try:
-        response = get_medicine_info_from_llama(extracted_name)
+        response = get_medicine_info_from_deepseek(extracted_name)
         return jsonify({'response': response})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
